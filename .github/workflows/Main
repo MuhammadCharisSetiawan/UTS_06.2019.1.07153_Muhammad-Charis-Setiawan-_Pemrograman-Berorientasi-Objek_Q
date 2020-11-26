@@ -1,0 +1,296 @@
+package MainClass;
+
+import Entity.*;
+import Model.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Scanner;
+import java.util.Date;
+
+public class Main {    
+    private static Scanner input = new Scanner(System.in);
+    private static KendaraanModel kendaraanModel = new KendaraanModel();
+    private static NotaPerjamModel notaperjamModel = new NotaPerjamModel();
+    private static NotaPerhariModel notaperhariModel = new NotaPerhariModel();
+    private static int loopjam,loophari,nonotajam,nonotahari;
+    
+    public static void main(String[] args) {
+        Main main = new Main();
+        System.out.println("Program sistem informasi data parkir");
+        int pilihan;
+        do {
+            System.out.println("[1] Input data");
+            System.out.println("[2] Lihat data"); 
+            System.out.println("[3] Delete data");
+            System.out.println("[4] Cetak nota");
+            System.out.println("[5] Exit");
+            System.out.print("Pilihan = ");
+            pilihan = input.nextInt();
+            switch(pilihan){
+                case 1:
+                    main.input();
+                    break;
+                case 2 :
+                    main.lihatdata();
+                    break;
+                case 3 : 
+                    main.delete();
+                    break;
+                case 4 :   
+                    main.cetaknota();
+                    break;
+            } 
+        }while(pilihan!=5);
+    }
+    void input(){
+        System.out.println("1. Parkir perjam");
+        System.out.println("2. Parkir menginap");
+        System.out.println("Pilihan parkir = ");
+        int index=input.nextInt();
+        if(index == 1){
+            System.out.print("Masukkan jenis kendaraan  = ");
+            String jeniskendaraan = input.next();
+            System.out.print("Masukkan plat nomor       = ");
+            String platnomor = input.next();
+            nonotajam++;
+            if(nonotahari>=1){
+                nonotajam=nonotahari+1;
+            }
+            kendaraanModel.insert(new KendaraanEntity(platnomor,jeniskendaraan,"parkir"));
+            DateFormat formatHmasuk = new SimpleDateFormat("HH");
+            DateFormat formatMmasuk = new SimpleDateFormat("mm");
+            Date getjammasuk = new Date();
+            Date getmenitmasuk = new Date(); 
+            String jammasuk = formatHmasuk.format(getjammasuk);
+            String menitmasuk = formatMmasuk.format(getmenitmasuk);
+            notaperjamModel.insert(new NotaPerjamEntity(0,nonotajam,"parkir",new Date(),jammasuk,menitmasuk,0,0));
+            loopjam++;
+        }
+        if(index==2){
+            System.out.print("Masukkan jenis kendaraan  = ");
+            String jeniskendaraan = input.next();
+            System.out.print("Masukkan plat nomor       = ");
+            String platnomor = input.next();
+            nonotahari++;
+            if(nonotajam>=1){
+                nonotahari=nonotajam+1;
+            }
+            kendaraanModel.insert(new KendaraanEntity(platnomor,jeniskendaraan,"parkir"));
+            DateFormat formatTmasuk = new SimpleDateFormat("dd");
+            DateFormat formatBmasuk = new SimpleDateFormat("MM");
+            DateFormat formatTHmasuk = new SimpleDateFormat ("yyyy");
+            Date gettanggalmasuk = new Date();
+            Date getbulanmasuk = new Date();
+            Date gettahunmasuk = new Date();
+            String tanggalmasuk = formatTmasuk.format(gettanggalmasuk);
+            String bulanmasuk = formatBmasuk.format(getbulanmasuk);
+            String tahunmasuk = formatTHmasuk.format(gettahunmasuk);
+            notaperhariModel.insert(new NotaPerhariEntity(tanggalmasuk,bulanmasuk,tahunmasuk,0,0,0,"parkir",0,nonotahari));
+            loophari++;
+        }
+    }
+    
+    void lihatdata(){
+        System.out.println("1. Parkir perjam");
+        System.out.println("2. Parkir perhari");
+        System.out.println("Lihat data no :");
+        int index = input.nextInt();
+        switch(index){
+            case 1 :
+                while(loopjam ==0){
+                    System.out.println("data kosong");
+                    break;
+                }
+                if(loopjam>0){
+                    System.out.println("Parkir perjam");
+                    for(int i=0;i<loopjam;i++){
+                        System.out.println("Kondisi kendaraan   = "+kendaraanModel.showData(notaperjamModel.showData(i).getNoNota()-1).getKondisi());    
+                        System.out.println("Jenis kendaraan     = "+kendaraanModel.showData(notaperjamModel.showData(i).getNoNota()-1).getJenisKendaraan());
+                        System.out.println("Plat nomor          = "+kendaraanModel.showData(notaperjamModel.showData(i).getNoNota()-1).getPlatNomor());            
+                        System.out.println("Tanggal parkir      = "+new SimpleDateFormat("dd-MM-yyyy").format(notaperjamModel.showData(i).getTanggalMasuk()));
+                        System.out.println("Waktu masuk         = "+notaperjamModel.showData(i).getJamMasuk() + " : " + notaperjamModel.showData(i).getMenitMasuk() + " WIB");
+                        if("sudah keluar".equals(kendaraanModel.showData(i).getKondisi())){
+                            System.out.println("Waktu keluar        = " +notaperjamModel.showData(i).getJamKeluar() + " : " + notaperjamModel.showData(i).getMenitKeluar() + " WIB");
+                        }
+                        System.out.println("-----------------------------------------------------------");
+                    }
+                }
+                break;
+            case 2 :
+                while(loophari ==0){
+                    System.out.println("data kosong");
+                    break;
+                }
+                if(loophari >0){
+                    System.out.println("Parkir harian");
+                    for(int i=0;i<loophari;i++){
+                        System.out.println("Kondisi kendaraan   = "+kendaraanModel.showData(notaperhariModel.showData(i).getNoNota()-1).getKondisi());    
+                        System.out.println("Jenis kendaraan     = "+kendaraanModel.showData(notaperhariModel.showData(i).getNoNota()-1).getJenisKendaraan());
+                        System.out.println("Plat nomor          = "+kendaraanModel.showData(notaperhariModel.showData(i).getNoNota()-1).getPlatNomor());
+                        System.out.println("Tanggal parkir      = "+notaperhariModel.showData(i).getTanggalMasuk()+"/"+notaperhariModel.showData(i).getBulanMasuk()+"/"+notaperhariModel.showData(i).getTahunMasuk());
+                        if("sudah keluar".equals(kendaraanModel.showData(i).getKondisi())){
+                        System.out.println("Tanggal keluar        = " +notaperhariModel.showData(i).getTanggalKeluar()+"/"+notaperhariModel.showData(i).getBulanKeluar()+"/"+notaperhariModel.showData(i).getTahunKeluar());
+                        }
+                    }
+                    System.out.println("-----------------------------------------------------------");
+                }
+                break;
+        }
+    }
+    
+    void delete(){
+        System.out.println("1. Parkir perjam");
+        System.out.println("2. Parkir menginap");
+        System.out.print("Data dari parkir mana yang mau dihapus? ");
+        int index = input.nextInt();
+        switch(index){
+            case 1 :
+                if(loopjam==0){
+                    System.out.println("Data kosong");
+                    break;
+                }
+                else{
+                    for(int i=0;i<loopjam;i++){
+                    System.out.println("["+i+"] Plat nomor = "+kendaraanModel.showData(notaperjamModel.showData(i).getNoNota()-1).getPlatNomor());
+                    }
+                    System.out.println("hapus plat nomor pada index ke = ");
+                    int hapus=input.nextInt();
+                    notaperjamModel.delete(hapus);
+                    loopjam--;
+                    break;
+                }
+            case 2 :
+                if(loophari==0){
+                    System.out.println("Data kosong");
+                    break;
+                }
+                else{
+                    for(int i=0;i<loophari;i++){
+                    System.out.println("["+i+"] Plat nomor = "+kendaraanModel.showData(notaperhariModel.showData(i).getNoNota()-1).getPlatNomor());
+                    }
+                    System.out.println("hapus plat nomor pada index ke = ");
+                    int hapus=input.nextInt();
+                    notaperhariModel.delete(hapus);
+                    loophari--;
+                    break;
+                }                
+        }
+    }
+    
+    void cetaknota(){
+        System.out.println("1. Cetak nota untuk parkir perjam");
+        System.out.println("2. Cetak nota untuk parkir menginap");
+        System.out.println("Cetak nota no ");
+        int index = input.nextInt();
+        switch(index){
+            case 1 :
+                if(loopjam==0){
+                    System.out.println("Data kosong");
+                    break;
+                }
+                else{
+                    for(int i=0;i<loopjam;i++){
+                        System.out.println("no nota    = "+notaperjamModel.showData(i).getNoNota());
+                        System.out.println("["+i+"] Plat nomor = "+kendaraanModel.showData(notaperjamModel.showData(i).getNoNota()-1).getPlatNomor());
+                    }
+                    System.out.println("no nota yang ingin dicetak = ");
+                    int idx=input.nextInt();
+                    System.out.println("index plat nomor           = ");
+                    int idx2=input.nextInt();
+                    kendaraanModel.showData(idx-1).setKondisi("sudah keluar");
+                    System.out.println("Masukkan jam keluar   = ");
+                    int jamkeluar = input.nextInt();
+                    notaperjamModel.showData(idx2).setJamKeluar(jamkeluar);
+                    System.out.println("Masukkan menit keluar = ");
+                    int menitkeluar = input.nextInt();
+                    notaperjamModel.showData(idx2).setMenitKeluar(menitkeluar);
+                    int jammasuk = Integer.parseInt(notaperjamModel.showData(idx2).getJamMasuk());
+                    int menitmasuk = Integer.parseInt(notaperjamModel.showData(idx2).getMenitMasuk());
+                    System.out.println("====BANDAR UDARA JUANDA SURABAYA====");
+                    System.out.println("====================================");
+                    System.out.println("Jenis kendaraan     = "+kendaraanModel.showData(idx-1).getJenisKendaraan());
+                    System.out.println("Plat nomor          = "+kendaraanModel.showData(idx-1).getPlatNomor());
+                    System.out.println("Tanggal parkir      = "+ new SimpleDateFormat("dd-MM-yyyy").format(notaperjamModel.showData(idx2).getTanggalMasuk()));
+                    System.out.println("Waktu masuk         = "+ jammasuk + " : " + menitmasuk + " WIB");
+                    System.out.println("Waktu keluar        = "+ notaperjamModel.showData(idx2).getJamKeluar() + " : " + notaperjamModel.showData(idx2).getMenitKeluar() + " WIB");
+                    int durasijam = notaperjamModel.showData(idx2).getJamKeluar() - jammasuk;
+                    int durasimenit = notaperjamModel.showData(idx2).getMenitKeluar() - menitmasuk;
+                    System.out.println("Durasi parkir       = " + durasijam + " : " + durasimenit);  
+                    if ("mobil".equals(kendaraanModel.showData(idx-1).getJenisKendaraan())){
+                        int harga1 = durasijam*5000;
+                        int harga2 = durasimenit*100;
+                        int totalH = harga1 + harga2;
+                        System.out.println("Harga parkir        = "+totalH);
+                    }
+                    else if ("motor".equals(kendaraanModel.showData(idx-1).getJenisKendaraan())){
+                        int harga1 = durasijam*2000;
+                        int harga2 = durasimenit*50;
+                        int totalH = harga1 + harga2;
+                        System.out.println("Harga parkir        = "+totalH);
+                    }
+                    else{
+                        System.out.println("PILIHAN KENDARAAN SALAH");
+                    }
+                    System.out.println("====================================");
+                    break;
+                }
+            case 2 :
+                if(loophari==0){
+                    System.out.println("Data kosong");
+                    break;
+                }
+                else{
+                    for(int i=0;i<loophari;i++){
+                    System.out.println("no nota    = "+notaperhariModel.showData(i).getNoNota());    
+                    System.out.println("["+i+"] Plat nomor = "+kendaraanModel.showData(notaperhariModel.showData(i).getNoNota()-1).getPlatNomor());
+                    }
+                    System.out.println("no nota yang ingin dicetak = ");
+                    int idx=input.nextInt();
+                    System.out.println("index plat nomor           = ");
+                    int idx2=input.nextInt();
+                    kendaraanModel.showData(idx-1).setKondisi("sudah keluar");
+                    System.out.println("Masukkan tanggal keluar    = ");
+                    int tanggalkeluar=input.nextInt();
+                    notaperhariModel.showData(idx2).setTanggalKeluar(tanggalkeluar);
+                    System.out.println("Masukkan bulan keluar      = ");
+                    int bulankeluar=input.nextInt();
+                    notaperhariModel.showData(idx2).setBulanKeluar(bulankeluar);
+                    System.out.println("Masukkan tahun keluar      = ");
+                    int tahunkeluar=input.nextInt();
+                    notaperhariModel.showData(idx2).setTahunKeluar(tahunkeluar);
+                    int tanggalmasuk = Integer.parseInt(notaperhariModel.showData(idx2).getTanggalMasuk());
+                    int bulanmasuk = Integer.parseInt(notaperhariModel.showData(idx2).getBulanMasuk());
+                    int tahunmasuk = Integer.parseInt(notaperhariModel.showData(idx2).getTahunMasuk());
+                    System.out.println("====BANDAR UDARA JUANDA SURABAYA====");
+                    System.out.println("====================================");
+                    System.out.println("Jenis kendaraan     = "+kendaraanModel.showData(idx-1).getJenisKendaraan());
+                    System.out.println("Plat nomor          = "+kendaraanModel.showData(idx-1).getPlatNomor());
+                    System.out.println("Tanggal masuk       = "+tanggalmasuk+"/"+bulanmasuk+"/"+tahunmasuk);
+                    System.out.println("Tanggal keluar      = "+notaperhariModel.showData(idx2).getTanggalKeluar() + "/" + notaperhariModel.showData(idx2).getBulanKeluar() + "/" + notaperhariModel.showData(idx2).getTahunKeluar());
+                    int durasihari = notaperhariModel.showData(idx2).getTanggalKeluar() - tanggalmasuk;
+                    int durasibulan = notaperhariModel.showData(idx2).getBulanKeluar() - bulanmasuk;
+                    int durasitahun = notaperhariModel.showData(idx2).getTahunKeluar() - tahunmasuk;
+                    System.out.println("Durasi parkir       = "+durasihari + "/" + durasibulan + "/"+durasitahun);  
+                    if ("mobil".equals(kendaraanModel.showData(idx-1).getJenisKendaraan())){
+                        int harga1 = durasihari*50000;
+                        int harga2 = durasibulan*500000;
+                        int harga3 = durasitahun*5000000;
+                        int totalH = harga1 + harga2 + harga3;
+                        System.out.println("Harga parkir        = "+totalH);
+                    }
+                    else if ("motor".equals(kendaraanModel.showData(idx-1).getJenisKendaraan())){
+                        int harga1 = durasihari*30000;
+                        int harga2 = durasibulan*300000;
+                        int harga3 = durasitahun*3000000;
+                        int totalH = harga1 + harga2 + harga3;
+                        System.out.println("Harga parkir        = "+totalH);
+                    }
+                    else{
+                        System.out.println("PILIHAN KENDARAAN SALAH");
+                    }
+                    System.out.println("====================================");
+                    break;   
+                }
+        }
+    }
+}
